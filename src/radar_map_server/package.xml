@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>radar_map_server</name>
+  <version>0.0.0</version>
+  <description>ROS 2 Python package to publish a radar-derived occupancy grid from a heatmap array.</description>
+
+  <maintainer email="you@example.com">Your Name</maintainer>
+  <license>Apache-2.0</license>
+
+  <!-- <buildtool_depend>ament_python</buildtool_depend> -->
+
+  <!-- Need these dependencies -->
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>nav_msgs</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <!-- <exec_depend>numpy</exec_depend> -->
+  <!-- Add them to the package.xml wherever this goes -->
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>
