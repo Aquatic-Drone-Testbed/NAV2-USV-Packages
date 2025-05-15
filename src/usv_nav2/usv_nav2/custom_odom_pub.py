@@ -38,7 +38,7 @@ class CustomOdometryPublisher(Node):
 
         x = pose_list[self.pose_index][1]
         y = pose_list[self.pose_index][2]
-        theta = pose_list[self.pose_index][3] * -math.pi / 180 #negate radians
+        theta = pose_list[self.pose_index][3] * (-math.pi / 180.0) - math.pi / 2.0 #negate radians and rotate 90 degrees
         # Convert yaw to quaternion
         q = tf_transformations.quaternion_from_euler(0, 0, theta)
         quat = Quaternion(x=q[0], y=q[1], z=q[2], w=q[3])
