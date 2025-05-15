@@ -34,7 +34,7 @@ class Cmd_Vel2ThrustModule(Node):
     def get_cmd_vel(self, msg):
         linear = msg.linear
         angular = msg.angular
-        self.get_logger().info(
+        self.get_logger().debug(
             f'Linear: x={linear.x:.2f}, y={linear.y:.2f}, z={linear.z:.2f} | '
             f'Angular: x={angular.x:.2f}, y={angular.y:.2f}, z={angular.z:.2f}'
         )
@@ -44,7 +44,7 @@ class Cmd_Vel2ThrustModule(Node):
         
         self.sock.sendto(message.encode('utf-8'), (self.udp_ip, self.udp_port))
 
-        self.get_logger().info(f'Sent UDP: {message}')
+        self.get_logger().debug(f'Sent UDP: {message}')
 
 def main(args=None):
     rclpy.init(args=args)

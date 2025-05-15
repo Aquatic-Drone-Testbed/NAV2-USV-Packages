@@ -24,34 +24,26 @@ class HeatmapPublisher(Node):
         self.declare_parameter('occupied_thresh', 90.0)
 
         # --- get parameters ---
-        self.fn       = self.get_parameter('heatmap_file').get_parameter_value().string_value
-        self.frame_id = self.get_parameter('map_frame').get_parameter_value().string_value
-        self.res      = self.get_parameter('resolution').get_parameter_value().double_value
-        self.ox       = self.get_parameter('origin_x').get_parameter_value().double_value
-        self.oy       = self.get_parameter('origin_y').get_parameter_value().double_value
-        self.oyaw     = self.get_parameter('origin_yaw').get_parameter_value().double_value
-        self.ft       = self.get_parameter('free_thresh').get_parameter_value().double_value
-        self.ot       = self.get_parameter('occupied_thresh').get_parameter_value().double_value
+        fn       = self.get_parameter('heatmap_file').get_parameter_value().string_value
+        frame_id = self.get_parameter('map_frame').get_parameter_value().string_value
+        res      = self.get_parameter('resolution').get_parameter_value().double_value
+        ox       = self.get_parameter('origin_x').get_parameter_value().double_value
+        oy       = self.get_parameter('origin_y').get_parameter_value().double_value
+        oyaw     = self.get_parameter('origin_yaw').get_parameter_value().double_value
+        ft       = self.get_parameter('free_thresh').get_parameter_value().double_value
+        ot       = self.get_parameter('occupied_thresh').get_parameter_value().double_value
 
-        # --- publisher with transient_local (latched) QoS ---
-        qos = QoSProfile(depth=1)
-        qos.durability = QoSDurabilityPolicy.TRANSIENT_LOCAL
-        self.pub = self.create_publisher(OccupancyGrid, 'map', qos)
-
-        # publish once per second
-        self.create_timer(2.55, self.update_map)
-    def update_map(self):
         # --- load and convert heatmap ---
-        hm = np.load(self.fn)             # shape (H, W)
+        hm = np.load(fn)             # shape (H, W)
         hm = np.flipud(hm)
         H, W = hm.shape
         data = []
         for y in range(H):
             for x in range(W):
                 v = hm[y, x]
-                if v >= self.ot:
+                if v >= ot:
                     data.append(100)
-                elif v <= self.ft:
+                elif v <= ft:
                     data.append(0)
                 else:
                     data.append(-1)
@@ -61,14 +53,14 @@ class HeatmapPublisher(Node):
 
         # header
         msg.header.stamp = self.get_clock().now().to_msg()
-        msg.header.frame_id = self.frame_id
+        msg.header.frame_id = frame_id
 
         # map metadata
-        msg.info.resolution = float(self.res)
+        msg.info.resolution = float(res)
         msg.info.width = W
         msg.info.height = H
-        msg.info.origin.position.x = float(self.ox)
-        msg.info.origin.position.y = float(self.oy)
+        msg.info.origin.position.x = float(ox)
+        msg.info.origin.position.y = float(oy)
 
         # 2d map means no rotation for Z yaw → identity quaternion
         msg.info.origin.orientation.x = 0.0
@@ -79,7 +71,13 @@ class HeatmapPublisher(Node):
         # occupancy data
         msg.data = data
 
-        self._publish(msg)
+        # --- publisher with transient_local (latched) QoS ---
+        qos = QoSProfile(depth=1)
+        qos.durability = QoSDurabilityPolicy.TRANSIENT_LOCAL
+        self.pub = self.create_publisher(OccupancyGrid, 'map', qos)
+
+        # publish once per second
+        self.create_timer(1.0, lambda: self._publish(msg))
 
     def _publish(self, msg):
         msg.header.stamp = self.get_clock().now().to_msg()

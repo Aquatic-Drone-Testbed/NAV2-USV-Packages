@@ -75,7 +75,7 @@ def generate_launch_description():
     rviz2_config = os.path.join(
         get_package_share_directory('usv_nav2'),
         'config',
-        'rad2las_slam.rviz'
+        'slam.rviz'
     )
 
     # RVIZ2node
