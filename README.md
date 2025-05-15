@@ -22,9 +22,9 @@ Run the build script:
 
 # Instruction to Run
 
-Run the following commands in separate terminals:
-- To launc the stack:
+Run the following command:
+- To launch the stack:
     ```bash
-       usv_nav2_launch.sh
+       ./usv_nav2_launch.sh
     ```
 
