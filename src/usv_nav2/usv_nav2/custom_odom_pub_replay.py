@@ -73,7 +73,7 @@ def main(args=None):
 
     global pose_list
 
-    with open('/home/ws/map/7_pose_estimation.txt', 'r') as file:
+    with open('/home/ws/map/demo/7_pose_estimation.txt', 'r') as file:
         content = file.read()
 
     # Apply regex to extract data

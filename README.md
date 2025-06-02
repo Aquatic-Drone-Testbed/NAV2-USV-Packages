@@ -12,7 +12,7 @@ Environment setup is based on [ROS2 Community Guide](https://docs.ros.org/en/hum
 5. Wait for container to install
 
 
-## Instruction to Build at frist time
+## Instruction to Build at first time
 
 Run the build script:
     ```bash

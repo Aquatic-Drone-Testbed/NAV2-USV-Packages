@@ -9,7 +9,10 @@ import math
 import tf_transformations
 import re
 
-pattern = r'(\d+)\s+\((\d+),(\d+)\)\s+([\d.]+)'
+#346, 273
+
+#pattern = r'(\d+)\s+\((\d+),(\d+)\)\s+([\d.]+)'
+pattern = r'(\d+)\t\((\d+),(\d+)\)\t(-?\d+\.\d+)'
 
 class GoalPublisher(Node):
     def __init__(self):
@@ -19,14 +22,14 @@ class GoalPublisher(Node):
         self.get_logger().info('Goal Publisher has started.')
 
     def publish_goal(self):
-        with open('/home/ws/map/7_pose_estimation.txt', 'r') as file:
+        with open('/home/ws/map/goal_pose.txt', 'r') as file:
             content = file.read()
 
         matches = re.findall(pattern, content)
         pose_list = [(int(a), (float(b)-250.0)*0.05, (float(c)-250.0)*-0.05, float(d)) for a, b, c, d in matches]
-        x = pose_list[8][1]
-        y = pose_list[8][2]
-        theta = pose_list[8][3] * (-math.pi / 180.0) - math.pi / 2.0 #negate radians and rotate 90 degrees
+        x = pose_list[0][1]
+        y = pose_list[0][2]
+        theta = pose_list[0][3] * (-math.pi / 180.0) - math.pi / 2.0 #negate radians and rotate 90 degrees
         # Convert yaw to quaternion
         q = tf_transformations.quaternion_from_euler(0, 0, theta)
         quat = Quaternion(x=q[0], y=q[1], z=q[2], w=q[3])

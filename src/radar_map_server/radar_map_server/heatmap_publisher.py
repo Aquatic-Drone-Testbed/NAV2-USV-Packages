@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import math
+import os
 import numpy as np
 
 import rclpy
@@ -8,6 +9,8 @@ from rclpy.qos import QoSProfile, QoSDurabilityPolicy
 
 from std_msgs.msg import Header
 from nav_msgs.msg import OccupancyGrid
+
+from rclpy.callback_groups import ReentrantCallbackGroup
 
 class HeatmapPublisher(Node):
     def __init__(self):
@@ -38,9 +41,15 @@ class HeatmapPublisher(Node):
         qos.durability = QoSDurabilityPolicy.TRANSIENT_LOCAL
         self.pub = self.create_publisher(OccupancyGrid, 'map', qos)
 
+        reentrant_callback_group = ReentrantCallbackGroup()
+
         # publish once per second
-        self.create_timer(2.55, self.update_map)
+        self.create_timer(2.55, self.update_map, reentrant_callback_group)
     def update_map(self):
+
+        if not os.path.exists(self.fn):
+            return
+
         # --- load and convert heatmap ---
         hm = np.load(self.fn)             # shape (H, W)
         hm = np.flipud(hm)

@@ -34,7 +34,8 @@ data_files=[
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'usv_nav2 = usv_nav2.custom_odom_pub:main'
+            'custom_odom = usv_nav2.custom_odom_pub:main',
+            'custom_odom_imu = usv_nav2.custom_odom_pub_imu:main',
         ],
     },
 )

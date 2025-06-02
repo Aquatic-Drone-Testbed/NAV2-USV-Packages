@@ -36,7 +36,7 @@ def generate_launch_description():
     # Lifecycle node
     usv_nav2_node = LifecycleNode(
         package='usv_nav2',
-        executable='custom_odom',
+        executable='custom_odom_imu',
         name=node_name,
         namespace='',
         output='screen',
@@ -52,6 +52,13 @@ def generate_launch_description():
     with open(urdf, 'r') as infp:
         robot_desc = infp.read()
 
+    # EKF path
+    ekf_config_name = 'ekf.yaml'
+    ekf_path = os.path.join(
+        get_package_share_directory('usv_nav2'),
+        'config',
+        ekf_config_name)
+
     # Robot State Publisher node
     rsp_node = Node(
         package='robot_state_publisher',
@@ -62,6 +69,16 @@ def generate_launch_description():
         arguments=[urdf]
     )
 
+    #  EKF node from robot_localization
+    ekf_node = Node(
+        package='robot_localization',
+        executable='ekf_node',
+        name='ekf_filter_node',
+        output='screen',
+        parameters=[ekf_path],
+    )
+
+
     # Publish static transform
     map_odom_tf = Node(
         package='tf2_ros',
@@ -71,21 +88,30 @@ def generate_launch_description():
         arguments=['0', '0', '0', '0', '0', '0', 'map', 'odom']
     )
 
-    # RVIZ2 settings
-    rviz2_config = os.path.join(
-        get_package_share_directory('usv_nav2'),
-        'config',
-        'slam.rviz'
+    # Publish static transform
+    imu_tf = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='static_transform_publisher',
+        output='screen',
+        arguments=['0', '0', '0', '0', '0', '0', 'base_link', 'imu_link']
     )
 
-    # RVIZ2node
-    rviz2_node = Node(
-        package='rviz2',
-        executable='rviz2',
-        name='rviz2',
-        output='screen',
-        arguments=[["-d"], [rviz2_config]]
-    )
+    # # RVIZ2 settings
+    # rviz2_config = os.path.join(
+    #     get_package_share_directory('usv_nav2'),
+    #     'config',
+    #     'slam.rviz'
+    # )
+
+    # # RVIZ2node
+    # rviz2_node = Node(
+    #     package='rviz2',
+    #     executable='rviz2',
+    #     name='rviz2',
+    #     output='screen',
+    #     arguments=[["-d"], [rviz2_config]]
+    # )
 
     # Define LaunchDescription variable
     ld = LaunchDescription()
@@ -99,8 +125,14 @@ def generate_launch_description():
     # Launch tf node
     ld.add_action(usv_nav2_node)
 
+    # Launch EKF node
+    ld.add_action(ekf_node)
+
     # Launch map odom static tf node
     ld.add_action(map_odom_tf)
+
+    # Launch imu static tf publisher node
+    ld.add_action(imu_tf)
 
     # Start RVIZ2
     # ld.add_action(rviz2_node)
